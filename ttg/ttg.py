@@ -149,7 +149,7 @@ class Truths:
         self.ints = ints
 
         # generate the sets of booleans for the bases
-        self.base_conditions = list(itertools.product([True, False],
+        self.base_conditions = list(itertools.product([False, True],
                                                       repeat=len(bases)))
 
         # regex to match whole words defined in self.bases
@@ -208,7 +208,7 @@ class Truths:
         df = pd.DataFrame(columns=df_columns)
         for conditions_set in self.base_conditions:
             df.loc[len(df)] = self.calculate(*conditions_set)
-        df.index = np.arange(1, len(df) + 1)  # index starting in one
+        df.index = np.arange(0, len(df))  # index starting in one
         return df
 
     def as_tabulate(self, index=True, table_format='psql', align='center'):
