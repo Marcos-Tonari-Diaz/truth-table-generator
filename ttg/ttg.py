@@ -147,6 +147,7 @@ class Truths:
         self.bases = bases
         self.phrases = phrases or []
         self.ints = ints
+        self.minterms = []
 
         # generate the sets of booleans for the bases
         self.base_conditions = list(itertools.product([False, True],
@@ -242,6 +243,33 @@ class Truths:
             return 'Contradiction'
         else:
             return 'Contingency'
+    
+    def as_pandas_minterms(self):
+        """
+        Table with minterms
+        """
+        df_columns = self.bases + self.phrases
+        df = pd.DataFrame(columns=df_columns)
+        for conditions_set in self.base_conditions:
+            df.loc[len(df)] = self.calculate(*conditions_set)
+        df.index = np.arange(0, len(df))  # index starting in zero
+        # converts a row to a minterm expression
+        mintermExpression =  lambda l,b: " and ".join(["(~"+str(l[i])+")" if b[i]==0 else str(l[i]) for i in range(len(b))])
+        # applies mintermExpression to all rows
+        self.minterms =  ["("+ mintermExpression(df.columns, df.iloc[i]) +")" for i in range(len(df))] 
+        # converts a row to a minterm string
+        mintermNotation = lambda l, b: "".join(["(~"+str(l[i])+")" if b[i]==0 else str(l[i]) for i in range(len(b))])
+        # applies mintermNotation to all rows
+        minterms = [mintermNotation(df.columns, df.iloc[i]) for i in range(len(df))] 
+        # assigns a new minterm column
+        df['minterms'] = minterms
+        return df
+
+    # returns a sum-of-products function made with miniterms defined by indexes as a phrase
+    # used to creat a new table
+    def SOP(self, indexes):
+        selected_minterms=[self.minterms[i] for i in indexes]
+        return " or ".join(selected_minterms)
 
     def __str__(self):
         table = Truths.as_tabulate(self, index=False)
