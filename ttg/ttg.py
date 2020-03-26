@@ -268,6 +268,7 @@ class Truths:
     # returns a sum-of-products function made with miniterms defined by indexes as a phrase
     # used to creat a new table
     def SOP(self, indexes):
+        self.as_pandas_minterms()
         selected_minterms=[self.minterms[i] for i in indexes]
         return " or ".join(selected_minterms)
 
